@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "youtubesmartagent",
+  "private_key_id": "8f360515fdf23977ee0988b15b65709d3ae94ff2",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCvnPiHJ03mz0X8\n+g9WUTk228pmu5MEWm1JmJD6Z3fzMMDw3FiCb5OxyD62PDGCIBTlipaRgvO+XNGr\nkDMKNAUDZZa5zuZsiOy/f5/Z4+8ZoxrHaWruXduMve3w9QHZlJnHqFpk7uBnZrYV\nMMYOYytcLT55to7ZjTLIhvMtLhuDSVpkCuB+qaC5AFkPauRL4jufSlja8ryOLAwN\noSSbqJYAys1auMX4H0p7l1Wy9SgJxILD2c6nphsVMzU0OYvYlD3NpEbE+2tAZQg6\nbAUXor6bfcwhfWteYwRqk9AkGogPEXj9lU4dH1OxcKXFEMBF0T8cii+yV3Ghr+kv\nXSp8nmfpAgMBAAECggEAEDZBZse4/DlvFH44v38W1TLH7gE7vqOC8o/+NVGrPAUI\nkMvEs4DtrXRHHs9yghjoWPL4+LSyQAUFWa1hmtvnyRMeLafVM5iV441aglTVoEQj\njxxzIc+CGs13W37g1XdvlWQcOTRovL75iP4EULR0vqkSGw4ghKKxeRvlM+rtYQqT\npzA81GppnaNTeIqwp0+N8FUotXxL/lsZImstzn1Qle5XlyaNZXJe3WHDTs9iBkyO\n+cJVShXbHkpF7kMOWGieXHjeHwoyAB39d8MQE8xBosIa8Iou1t4dfYhjY2vC81uK\nmaor5QvFAtH9X19sfUGzB9vhBSL05uWG6kk2z4Gu0QKBgQDkXpyFtnBBb1KhodnP\nKnFM6Ut6vrkZG9Yv5DEXdTj2D5aj3D3N/6zmV4bY4SoejBAiEECtnrC67Be6M46x\nLUv0PAEYFJY5+aFUOUnKLXC5NLT3PoLHZFqjnP9kfAu97rE2ogRsDHoguxurRXBW\nInMNgnfnjk9YykuW3eQtWyN2uQKBgQDE3FAFRXNFa/cdXFlaZbMJRx1z94H1Ndr7\nowms+cpeE541ZRuI2dER0LEEBzXxaZTHglZ9MPWe8nhCNig34ZZq9fJuVlbmRg+4\nb8gH0SXSZHEY8PVYjn2MoMEMZCIspyeGOX4KZWmtiinf135GEbG36Bx+tqiJUOWs\n9KiSN5risQKBgE03DDdNw1DsogTSo8GfOSXnL8U13YH23onc3xhuYy8XgDixTBht\n3XkYmRiVsVcYxo+t7SCHKnxZPYCQ1CtmBGt1Km2I8G5z0C+ZGzEIAjgs8Q80DKX8\ncYUmnVfNdW7n2PV+/H3IDjco7KcRWHVXOo2T0pTxkjSUWdCOAAux6CDJAoGAeegU\nha8kWvEo7j2p95jS7gPj8VRsXfUjzoCAFWX6M5fieR5LlsuL9IRPmjb86KqBP6su\n9AfFktCEODxhW3mPNF1p63n8Bk2MnqJaNL0HtuoMP224AUb76IIECjBYGV7J0wz3\nSGjUsGrG058Wyz1Z2JEcVDu40pAOKrS3TxSwDYECgYEAwYCI90KU/3oj9EFJLpLT\ndCZQCCiEzYdSFNidsn1W9ToI9H/qtTQ0kM3aHSrXMKnDE03OT86NxUgxYbDTifm/\nXAm97W8/6JHLI0vyUOrUca0oLX4z40IKevruSvx660isec0QvYok6KF/7+8MpRNc\no+4bDfLOBqKD9dXh0WEQni0=\n-----END PRIVATE KEY-----\n",
+  "client_email": "geometori@youtubesmartagent.iam.gserviceaccount.com",
+  "client_id": "108693784762517064992",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/geometori%40youtubesmartagent.iam.gserviceaccount.com"
+}

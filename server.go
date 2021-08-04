@@ -16,13 +16,11 @@ package main
 
 import (
 	//"fmt"
-
-	"fmt"
 	"github.com/bluele/mecab-golang"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	customsearch "google.golang.org/api/customsearch/v1"
+	"google.golang.org/api/customsearch/v1"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -65,6 +63,8 @@ func main() {
 					log.Print("//////" + "revieve message prevText=" + prevText + "///////")
 					var rawMessage = message.Text
 					var pronunciation string = parseToNode(m, rawMessage)
+					var imageURL string = GetImageFromKeyword(rawMessage)
+
 					log.Print("recieve:" + rawMessage)
 					if prevText == "__initText" {
 
@@ -85,7 +85,7 @@ func main() {
 						if lastText == firstText {
 							prevText = pronunciation
 							// reply Picture
-							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage("https://cdn.shibe.online/shibes/907fed97467e36f3075211872d98f407398126c4.jpg", "https://cdn.shibe.online/shibes/907fed97467e36f3075211872d98f407398126c4.jpg")).Do(); err != nil {
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(imageURL, imageURL)).Do(); err != nil {
 								log.Print(err)
 							}
 						} else {
@@ -139,7 +139,7 @@ func parseToNode(m *mecab.MeCab, word string) string {
 	return ans
 }
 
-func GetImageFromKeyword() string {
+func GetImageFromKeyword(keyword string) string {
 	data, err := ioutil.ReadFile("search-key.json")
 	if err != nil {
 		log.Fatal(err)
@@ -152,21 +152,25 @@ func GetImageFromKeyword() string {
 
 	client := conf.Client(oauth2.NoContext)
 	cseService, err := customsearch.New(client)
-	search := cseService.Cse.List("ロゴ")
+	search := cseService.Cse.List()
 
 	// 検索エンジンIDを適宜設定
-	search.Cx("xxxxx")
+	search.Cx("938fd93a468ac8dfb")
 	// Custom Search Engineで「画像検索」をオンにする
 	search.SearchType("image")
-
+	search.ExactTerms(keyword + "の風景")
+	search.Num(1)
 	search.Start(1)
 	call, err := search.Do()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for index, r := range call.Items {
-		fmt.Println(index)
-		fmt.Println(r.Link)
+	var result string
+
+	for _, r := range call.Items {
+		result = r.Link
 	}
+
+	return result
 }
