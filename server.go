@@ -36,8 +36,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var prevText string = "__initText"
-	var errMessage string = "しりとりになってないよ！！"
+	///script
+	var startMessage_begin = "スタート！最初の言葉は"
+	var startMessage_end = "だよ！"
+	var announceMessage_begin = "次は「"
+	var announceMessage_end = "」からスタートだよ！"
+	var nonLocateErrMessage string = "それは地名じゃない見たい...!"
+	var shiritoriErrMessage string = "しりとりになってないよ！！"
+	var imageErrMessage string = "の画像が見つからなかった！ごめん！"
+	var initErrMessage string = "ごめん！その単語は使えない見たい...他の単語で試してみて！"
+
+	var prev_lastText string = "__initText"
+
 	m, err := mecab.New("-Owakati")
 	if err != nil {
 		panic(err)
@@ -60,39 +70,57 @@ func main() {
 			if event.Type == linebot.EventTypeMessage {
 				switch message := event.Message.(type) {
 				case *linebot.TextMessage:
-					log.Print("//////" + "revieve message prevText=" + prevText + "///////")
+					log.Print("//////" + "revieve message rawMessage=" + message.Text + "///////")
+					//analyze message
 					var rawMessage = message.Text
-					var pronunciation string = parseToNode(m, rawMessage)
+					var pronunciation string = getPronunce(m, rawMessage)
+					var isLocate bool = isLocationName(m, rawMessage)
+
+					//get first and last literature
+					var this_headText string = getHeadText(pronunciation)
+					var this_lastText string = getLastText(pronunciation)
+
+					//get Image
 					var imageURL string = GetImageFromKeyword(rawMessage)
 
-					log.Print("recieve:" + rawMessage)
-					if prevText == "__initText" {
+					//replying
+					if prev_lastText == "__initText" { //////最初のひとこと目
 
-						prevText = pronunciation
-						// reply testMessage
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("testMSG_first_reply"+pronunciation)).Do(); err != nil {
-							log.Print(err)
-						}
-
-					} else {
-						r_pronunciation := []rune(pronunciation)
-						r_prevText := []rune(prevText)
-						var firstText string = string(r_pronunciation[:1])
-						var lastText string = string(r_prevText[len(r_prevText)-1:])
-
-						log.Print("lastText:" + lastText)
-						log.Print("firstText:" + firstText)
-						if lastText == firstText {
-							prevText = pronunciation
-							// reply Picture
-							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(imageURL, imageURL)).Do(); err != nil {
+						if this_lastText != "" {
+							prev_lastText = this_lastText
+							// reply testMessage
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(imageURL, imageURL), linebot.NewTextMessage(startMessage_begin+rawMessage+"("+pronunciation+")"+startMessage_end)).Do(); err != nil {
+								log.Print(err)
+							}
+						} else if isLocate == false {
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(nonLocateErrMessage)).Do(); err != nil {
 								log.Print(err)
 							}
 						} else {
-							// reply errMessage
-							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(errMessage+"_recieve:"+rawMessage+"("+pronunciation+")")).Do(); err != nil {
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(initErrMessage)).Do(); err != nil {
 								log.Print(err)
 							}
+						}
+
+					} else if imageURL != "" { //////普通の返信
+						if prev_lastText == this_headText { //////正しいしりとり
+							prev_lastText = this_lastText
+							// reply Picture
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(imageURL, imageURL), linebot.NewTextMessage(announceMessage_begin+prev_lastText+announceMessage_end)).Do(); err != nil {
+								log.Print(err)
+							}
+						} else if isLocate == false { //////地名じゃない
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(nonLocateErrMessage), linebot.NewTextMessage(announceMessage_begin+prev_lastText+announceMessage_end)).Do(); err != nil {
+								log.Print(err)
+							}
+						} else { //////正しくないしりとり
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(shiritoriErrMessage), linebot.NewTextMessage(announceMessage_begin+prev_lastText+announceMessage_end)).Do(); err != nil {
+								log.Print(err)
+							}
+						}
+					} else { //////画像が取得できなかった場合
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(rawMessage+imageErrMessage), linebot.NewTextMessage(announceMessage_begin+prev_lastText+announceMessage_end)).Do(); err != nil {
+							log.Print(err)
 						}
 					}
 				}
@@ -106,7 +134,8 @@ func main() {
 	}
 }
 
-func parseToNode(m *mecab.MeCab, word string) string {
+func getPronunce(m *mecab.MeCab, word string) string {
+	log.Print("getPronunce....")
 	//init
 	tg, err := m.NewTagger()
 	if err != nil {
@@ -123,23 +152,94 @@ func parseToNode(m *mecab.MeCab, word string) string {
 	node := tg.ParseToNode(lt)
 
 	//return
-	var ans string
+	var ans string = ""
 
 	for {
 		features := strings.Split(node.Feature(), ",")
-		if features[0] == "名詞" {
-			ans = features[7]
-			break
+		log.Print("形態素解析:" + node.Feature())
+		if features[0] == "名詞" && len(features) >= 8 {
+			ans += features[7]
 		}
 		if node.Next() != nil {
-			ans = ""
+			break
+		}
+	}
+	log.Print("get pronunce:" + ans)
+	return ans
+}
+
+func getLastText(w string) string {
+	var ans string
+	r_w := []rune(w)
+	for cnt := 1; cnt < len(r_w); cnt++ {
+		if len(r_w) != 0 {
+			ans = string(r_w[len(r_w)-cnt:])
+		} else {
+			ans = "err"
+		}
+
+		if ans != "ー" && ans != "ッ" {
 			break
 		}
 	}
 	return ans
 }
+func getHeadText(w string) string {
+	var ans string
+	r_w := []rune(w)
+
+	if len(r_w) != 0 {
+		ans = string(r_w[:1])
+	} else {
+		ans = "err"
+	}
+	return ans
+}
+
+func isLocationName(m *mecab.MeCab, word string) bool {
+	log.Print("check isLocate....")
+	//init
+	tg, err := m.NewTagger()
+	if err != nil {
+		panic(err)
+	}
+	defer tg.Destroy()
+	lt, err := m.NewLattice(word)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer lt.Destroy()
+
+	//parse
+	node := tg.ParseToNode(lt)
+
+	//return
+	var ans bool = false
+
+	for {
+		features := strings.Split(node.Feature(), ",")
+		//log.Print("形態素解析:" + node.Feature())
+		log.Print(features)
+		if features[0] == "名詞" {
+			log.Print(features[2])
+			ans = features[2] == "地域"
+			break
+		}
+		if node.Next() != nil {
+			ans = false
+			break
+		}
+	}
+	if ans {
+		log.Print("isLocate?: true")
+	} else {
+		log.Print("isLocate?: false")
+	}
+	return ans
+}
 
 func GetImageFromKeyword(keyword string) string {
+	log.Print("searching : " + keyword + "....")
 	data, err := ioutil.ReadFile("search-key.json")
 	if err != nil {
 		log.Fatal(err)
@@ -158,7 +258,8 @@ func GetImageFromKeyword(keyword string) string {
 	search.Cx("938fd93a468ac8dfb")
 	// Custom Search Engineで「画像検索」をオンにする
 	search.SearchType("image")
-	search.ExactTerms(keyword + "の風景")
+	search.Q(keyword + "の風景")
+	search.ImgType("photo")
 	search.Num(1)
 	search.Start(1)
 	call, err := search.Do()
@@ -170,6 +271,7 @@ func GetImageFromKeyword(keyword string) string {
 
 	for _, r := range call.Items {
 		result = r.Link
+		log.Print(result)
 	}
 
 	return result
